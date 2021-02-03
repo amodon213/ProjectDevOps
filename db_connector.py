@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 """Creds"""
 env_path = Path('.CREDS')
-load_dotenv(dotenv_path=env_path)
+load_dotenv()
 db_table = os.environ['DB_NAME']
 host_connection = os.environ['SERVER']
 port_connection = os.environ['PORT']
