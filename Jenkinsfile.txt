@@ -1,5 +1,13 @@
 pipeline {
     agent any
+    environment {
+        registry = "alexz213/devopscourse"
+        registryCredential = 'docker_hub'
+        dockerImage = ''
+        }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '5' ))
+    }
     stages {
         stage('Pull Code') {
             steps {
@@ -17,14 +25,7 @@ pipeline {
                 }
             }
         }
-        stage('run web app server') {
-            steps {
-                script {
-                    sh 'nohup python3.9 web_app.py &'
 
-                }
-            }
-        }
         stage('run backend testing') {
             steps {
                 script {
@@ -33,27 +34,63 @@ pipeline {
                 }
             }
         }
-        stage('run frontend testing') {
-            steps {
-                script {
-                    sh 'python3.9 frontend_testing.py'
-
-                }
-            }
-        }
-        stage('run combined testing') {
-            steps {
-                script {
-                    sh 'python3.9 combined_testing.py'
-
-                }
-            }
-        }
-        stage('run clean environmant ') {
+        stage('run clean environment ') {
             steps {
                 script {
                     sh ' python3.9 clean_environment.py'
 
+                }
+            }
+        }
+        stage('build docker image ') {
+            steps {
+                script {
+                    sh ' docker build -t ProjectDevOps .'
+                }
+            }
+        }
+         stage('build and push image') {
+            steps {
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                    docker.withRegistry('', registryCredential) {
+                    dockerImage.push()
+                    }
+                }
+            }
+        post{
+        always{
+            sh "docker rmi $registry:$BUILD_NUMBER"
+        }
+       }
+      }
+
+        stage('Set compose image version ') {
+            steps {
+                script {
+                    sh ' echo IMAGE_TAG=${BUILD_NUMBER} > .env'
+                }
+            }
+        }
+        stage('run docker compose ') {
+            steps {
+                script {
+                    sh ' docker-compose up -d '
+                }
+            }
+        }
+        stage('run docker backend testing') {
+            steps {
+                script {
+                    sh ' python3.9 docker_backend_testing.py'
+                }
+            }
+        }
+         stage('run clean docker environment environment ') {
+            steps {
+                script {
+                    sh 'docker rmi ProjectDevOps'
+                    sh 'docker-compose down'
                 }
             }
         }
