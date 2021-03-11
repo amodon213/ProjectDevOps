@@ -37,7 +37,9 @@ def user(id):
             return {'status': 'ok', 'user updated': id}, 200
         except:
             return {'status': 'error', 'reason': "no such id"}, 500
-
+@app.route('/')
+def health_check():
+    return "200"
 
 @app.route('/stop_server')
 def stop_server():
