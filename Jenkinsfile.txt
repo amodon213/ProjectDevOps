@@ -94,6 +94,13 @@ pipeline {
                 }
             }
         }
+        stage('deploy helm with latest build') {
+            steps {
+                script {
+                    sh 'helm upgrade --install testing alexz-0.0.1.tgz --set image.tag=${BUILD_NUMBER}'
+                }
+            }
+        }
         stage('Write service to url') {
             steps {
                 script {
