@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         registry = "alexz213/devopscourse"
-        registryCredential = 'docker_hub'
+        registryCredential = 'dockerhub'
         dockerImage = ''
         }
     options {
@@ -17,7 +17,7 @@ pipeline {
                 git 'https://github.com/amodon213/ProjectDevOps.git'
             }
         }
-        stage('run rest app server ') {
+        stage('run rest app server') {
             steps {
                 script {
                     sh 'nohup python3.9 rest_app.py &'
@@ -34,7 +34,7 @@ pipeline {
                 }
             }
         }
-        stage('run clean environment ') {
+        stage('run clean environment') {
             steps {
                 script {
                     sh ' python3.9 clean_environment.py'
@@ -42,10 +42,10 @@ pipeline {
                 }
             }
         }
-        stage('build docker image ') {
+        stage('build docker image') {
             steps {
                 script {
-                    sh ' docker build -t ProjectDevOps .'
+                    sh ' docker build -t devops_course .'
                 }
             }
         }
@@ -65,17 +65,17 @@ pipeline {
        }
       }
 
-        stage('Set compose image version ') {
+        stage('set compose image version') {
             steps {
                 script {
                     sh ' echo IMAGE_TAG=${BUILD_NUMBER} > .env'
                 }
             }
         }
-        stage('run docker compose ') {
+        stage('run docker compose') {
             steps {
                 script {
-                    sh ' docker-compose up -d '
+                    sh ' docker-compose up -d'
                 }
             }
         }
@@ -86,10 +86,10 @@ pipeline {
                 }
             }
         }
-         stage('run clean docker environment environment ') {
+         stage('run clean docker environment') {
             steps {
                 script {
-                    sh 'docker rmi ProjectDevOps'
+                    sh 'docker rmi devops_course'
                     sh 'docker-compose down'
                 }
             }
@@ -97,30 +97,35 @@ pipeline {
         stage('deploy helm with latest build') {
             steps {
                 script {
-                    sh 'helm upgrade --install testing alexz-0.0.1.tgz --set image.tag=${BUILD_NUMBER}'
+                    sh 'helm upgrade --install alexz-0.0.1.tgz --set image.tag=${BUILD_NUMBER}'
                 }
             }
         }
-        stage('Write service to url') {
+        stage('url to file') {
             steps {
                 script {
-                    sh 'minikube service testing-alexz --url > k8s_url.txt'
+                    sh 'minikube service k8s-check-project3 --url > k8s_url.txt'
                 }
+            }
+        }
+        stage ('wait for pods to start (sleep)') {
+            steps {
                 sleep 30
             }
         }
-        stage('write service to url') {
+        stage('k8s check') {
             steps {
                 script {
-                    sh 'python k8s_backend_testing.py'
+                    sh 'python3.9 k8s_backend_testing.py'
                 }
             }
         }
-        stage('Delete Helm chart') {
+        stage('clean environment') {
             steps {
                 script {
-                    sh 'helm delete testing'
+                    sh 'helm delete k8s-check'
                 }
             }
         }
     }
+}
