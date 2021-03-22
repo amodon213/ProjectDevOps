@@ -8,14 +8,14 @@ creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 """ Connection """
 
-env_path = Path('/Users/omerk/PycharmProjects/Python/DevOpsCourse/Projects/Project1') / 'creds'
-load_dotenv(dotenv_path=env_path)
+#env_path = Path('/Users/omerk/PycharmProjects/Python/DevOpsCourse/Projects/Project1') / 'creds'
+#load_dotenv(dotenv_path=env_path)
 
 conn = pymysql.connect(host='remotemysql.com',
                        port=3306,
-                       user='Mmy2cCFQLM',
-                       passwd='KDmN7fJmti',
-                       db='Mmy2cCFQLM',
+                       user='cReOSxv10Q',
+                       passwd='iKFLyKI8Aw',
+                       db='cReOSxv10Q',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
