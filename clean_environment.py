@@ -1,8 +1,11 @@
 import requests
 
-try:
-    requests.get('http://0.0.0.0:5000/stop_server', timeout=5)
-    print("Backend servers stopped")
 
-except requests.exceptions.ReadTimeout:
-    print("The request timeout -  504 error")
+try:
+    Message = "Servers were shutdown"
+    requests.get('http://127.0.0.1:5000/stop_server')
+except Exception as e:
+    print(e)
+    Message = "Couldn't shutdown servers"
+finally:
+    print(Message)
